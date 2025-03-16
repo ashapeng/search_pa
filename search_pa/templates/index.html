@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graduate Information Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .message {
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .bot-message {
+            background-color: #f1f0f0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            margin-right: auto;
+        }
+        .user-input {
+            background-color: #0084ff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            margin-left: auto;
+        }
+        .input-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0084ff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0073e6;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-box" id="chatBox">
+            <div class="message">
+                <div class="bot-message">Hello! I'll help you collect your information. What's your name?</div>
+            </div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Type your answer here..." autocomplete="off">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        const questions = [
+            "What's your name?",
+            "Which school are you applying to?",
+            "What graduate program are you interested in?",
+            "What is your country of citizenship?"
+        ];
+        const answers = {};
+
+        function addMessage(message, isUser) {
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            const innerDiv = document.createElement('div');
+            innerDiv.className = isUser ? 'user-input' : 'bot-message';
+            innerDiv.textContent = message;
+            messageDiv.appendChild(innerDiv);
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+
+            addMessage(message, true);
+            input.value = '';
+
+            // Store the answer
+            switch(currentQuestion) {
+                case 0: answers.name = message; break;
+                case 1: answers.school = message; break;
+                case 2: answers.program = message; break;
+                case 3: answers.citizenship = message; break;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                setTimeout(() => {
+                    addMessage(questions[currentQuestion], false);
+                }, 500);
+            } else {
+                // Submit all collected information
+                submitInformation();
+            }
+        }
+
+        function submitInformation() {
+            addMessage("Submitting your information...", false);
+            fetch('http://localhost:8000/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                mode: 'cors',
+                credentials: 'same-origin',
+                body: JSON.stringify(answers)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || `HTTP error! status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    addMessage("Thank you! Your information has been submitted successfully.", false);
+                    document.querySelector('.input-container').classList.add('hidden');
+                } else {
+                    throw new Error(data.message || "Unknown error occurred");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (error.message.includes('Failed to fetch')) {
+                    addMessage("Error: Cannot connect to the server. Please make sure the server is running and try again.", false);
+                } else {
+                    addMessage(`Error: ${error.message}. Please try again.`, false);
+                }
+                // Reset the current question to allow retry
+                currentQuestion = questions.length - 1;
+            });
+        }
+
+        // Handle Enter key
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 
