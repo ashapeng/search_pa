@@ -1,10 +1,19 @@
 ## 1. Introduction
-Ongoing build
 
-This is to create an AI agent for cross-database matching protein/gene among different species.
-## 2. Some important parameters needed
+This is to retrieve data from open source database.
+## 2. Some databases (API)
 
-### 2.1 Taxonomy name and ID, check [NCBI Taxonomy](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi)
+### 2.1 Protein DB: [Uniprot](https://www.uniprot.org/)
+
+### 2.2 Tanscription DB: [ENA](https://www.ebi.ac.uk/ena/browser/view/)
+
+### 2.3 Ortholog DB: [OrthoDB](https://www.ezlab.org/orthodb_v12_userguide.html#api)
+
+### 2.4 McGill Biology: [McGill Biology Department](https://www.mcgill.ca/biology/graduate-0/current-graduate-students-0)
+
+## 3 Supplements
+
+### 3.1 Taxonomy name and ID, check [NCBI Taxonomy](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi)
 
 <div align = "center">
 
