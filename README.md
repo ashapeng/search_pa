@@ -1,27 +1,110 @@
-## 1. Introduction
+# Notion Clone
 
-This is to retrieve data from open source database.
-## 2. Some databases (API)
+A web-based collaborative workspace similar to Notion, built with React, Node.js, Express, and MongoDB.
 
-### 2.1 Protein DB: [Uniprot](https://www.uniprot.org/)
+## Features
 
-### 2.2 Tanscription DB: [ENA](https://www.ebi.ac.uk/ena/browser/view/)
+- User authentication (register, login, logout)
+- Create, edit, and delete documents
+- Rich text editing with formatting options
+- Real-time collaboration
+- Document sharing
+- Hierarchical document organization
 
-### 2.3 Ortholog DB: [OrthoDB](https://www.ezlab.org/orthodb_v12_userguide.html#api)
+## Prerequisites
 
-### 2.4 McGill Biology: [McGill Biology Department](https://www.mcgill.ca/biology/graduate-0/current-graduate-students-0)
+- Node.js (v14 or higher)
+- MongoDB
+- npm or yarn
 
-## 3 Supplements
+## Installation
 
-### 3.1 Taxonomy name and ID, check [NCBI Taxonomy](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi)
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd notion-clone
+```
 
-<div align = "center">
+2. Install backend dependencies:
+```bash
+npm install
+```
 
-| Taxomnomy  | ID | NCBI BLAST name|
-|-------    |----- | -------    |
-| Eukaryota | 2759 | eukaryotes |
-| Bacteria  | 2    | bacteria   |
-| Archaea   | 2157 | archaea    |
-|Viruses    |10239 | viruses    |
+3. Install frontend dependencies:
+```bash
+cd client
+npm install
+cd ..
+```
 
-</div>
+4. Create a `.env` file in the root directory with the following variables:
+```
+MONGODB_URI=mongodb://localhost:27017/notion-clone
+JWT_SECRET=your-secret-key
+PORT=5000
+```
+
+## Running the Application
+
+1. Start the MongoDB server
+
+2. Start the backend server:
+```bash
+npm run dev
+```
+
+3. In a new terminal, start the frontend development server:
+```bash
+cd client
+npm start
+```
+
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+
+## Technologies Used
+
+- Frontend:
+  - React
+  - Material-UI
+  - Slate.js (rich text editor)
+  - Socket.io-client
+  - Axios
+
+- Backend:
+  - Node.js
+  - Express
+  - MongoDB
+  - Mongoose
+  - Socket.io
+  - JWT for authentication
+
+## Project Structure
+
+```
+notion-clone/
+├── client/                 # React frontend
+│   ├── public/
+│   └── src/
+│       ├── components/     # React components
+│       ├── contexts/       # React contexts
+│       └── App.js          # Main App component
+├── models/                 # MongoDB models
+├── routes/                 # API routes
+├── middleware/             # Express middleware
+├── server.js              # Backend entry point
+└── package.json           # Project dependencies
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

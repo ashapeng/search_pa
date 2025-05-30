@@ -185,6 +185,21 @@
             });
         }
 
+        function parseQuery(input) {
+            const parts = input.split(' at ');
+            if (parts.length === 2) {
+                currentQuery.professor_name = parts[0].trim();
+                // Normalize institution name to handle case variations
+                currentQuery.institution = parts[1].trim()
+                    .replace(/\b\w/g, l => l.toUpperCase()) // Capitalize first letter of each word
+                    .replace(/University/i, 'University') // Normalize "University" spelling
+                    .replace(/College/i, 'College') // Normalize "College" spelling
+                    .replace(/Institute/i, 'Institute'); // Normalize "Institute" spelling
+                return true;
+            }
+            return false;
+        }
+
         // Handle Enter key
         document.getElementById('userInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {

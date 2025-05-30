@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publication Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .search-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .paper {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .paper h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .paper-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+        .source-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .source-semantic {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        .source-pubmed {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .source-google {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .email-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .author-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .first-author {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        .corresponding-author {
+            background-color: #e8eaf6;
+            color: #283593;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 5px;
+        }
+        .checkbox-group input[type="radio"] {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        .checkbox-group label {
+            display: inline;
+            cursor: pointer;
+        }
+        .year-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .year-inputs input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <h1>Publication Search</h1>
+        <div class="form-group">
+            <label for="professorName">Professor Name:</label>
+            <input type="text" id="professorName" placeholder="Enter professor's name">
+        </div>
+        <div class="form-group">
+            <label for="institution">Institution:</label>
+            <input type="text" id="institution" placeholder="Enter institution name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email (for PubMed search):</label>
+            <input type="email" id="email" placeholder="Enter your email">
+            <div class="email-note">* Email is required for PubMed searches. If not provided, PubMed results will be skipped.</div>
+        </div>
+        <div class="form-group">
+            <label>Time Window:</label>
+            <div class="year-inputs">
+                <div>
+                    <label for="yearStart">From:</label>
+                    <input type="number" id="yearStart" min="1900" max="2024" placeholder="Start Year">
+                </div>
+                <div>
+                    <label for="yearEnd">To:</label>
+                    <input type="number" id="yearEnd" min="1900" max="2024" placeholder="End Year">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="researchField">Research Field:</label>
+            <select id="researchField">
+                <option value="">Any Field</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Filter by author position:</label>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="radio" id="anyPosition" name="authorPosition" value="any" checked>
+                    <label for="anyPosition">Anywhere</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="radio" id="firstAuthor" name="authorPosition" value="first">
+                    <label for="firstAuthor">First Author</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="radio" id="correspondingAuthor" name="authorPosition" value="corresponding">
+                    <label for="correspondingAuthor">Corresponding Author</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="radio" id="bothPositions" name="authorPosition" value="both">
+                    <label for="bothPositions">Both Positions</label>
+                </div>
+            </div>
+        </div>
+        <button onclick="searchPublications()">Search</button>
+    </div>
+
+    <div id="loading">Searching publications...</div>
+    <div id="results" class="results"></div>
+
+    <script>
+        function searchPublications() {
+            const professorName = document.getElementById('professorName').value;
+            const institution = document.getElementById('institution').value;
+            const email = document.getElementById('email').value;
+            const yearStart = document.getElementById('yearStart').value;
+            const yearEnd = document.getElementById('yearEnd').value;
+            const researchField = document.getElementById('researchField').value;
+            const authorPosition = document.querySelector('input[name="authorPosition"]:checked').value;
+            const resultsDiv = document.getElementById('results');
+            const loadingDiv = document.getElementById('loading');
+
+            if (!professorName || !institution) {
+                alert('Please provide both professor name and institution');
+                return;
+            }
+
+            // Validate years if provided
+            if ((yearStart && !yearEnd) || (!yearStart && yearEnd)) {
+                alert('Please provide both start and end years or leave both empty');
+                return;
+            }
+
+            if (yearStart && yearEnd) {
+                const startYear = parseInt(yearStart);
+                const endYear = parseInt(yearEnd);
+                const currentYear = new Date().getFullYear();
+
+                if (startYear > endYear) {
+                    alert('Start year cannot be greater than end year');
+                    return;
+                }
+
+                if (startYear < 1900 || endYear > currentYear) {
+                    alert(`Please enter years between 1900 and ${currentYear}`);
+                    return;
+                }
+            }
+
+            loadingDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+
+            fetch('http://localhost:5000/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    professor_name: professorName,
+                    institution: institution,
+                    email: email,
+                    year_start: yearStart || null,
+                    year_end: yearEnd || null,
+                    first_author_only: authorPosition === 'first',
+                    corresponding_author_only: authorPosition === 'corresponding',
+                    both_positions: authorPosition === 'both',
+                    research_field: researchField || null
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingDiv.style.display = 'none';
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p style="color: red">${data.error}</p>`;
+                    return;
+                }
+
+                const papers = data.papers;
+                if (papers && papers.length > 0) {
+                    const papersHtml = papers.map(paper => {
+                        let sourceClass = '';
+                        switch(paper.source) {
+                            case 'Semantic Scholar':
+                                sourceClass = 'source-semantic';
+                                break;
+                            case 'PubMed':
+                                sourceClass = 'source-pubmed';
+                                break;
+                            case 'Google Scholar':
+                                sourceClass = 'source-google';
+                                break;
+                        }
+
+                        return `
+                            <div class="paper">
+                                <h3>${paper.title}</h3>
+                                <div class="paper-meta">
+                                    Year: ${paper.year}
+                                    <span class="source-tag ${sourceClass}">${paper.source}</span>
+                                    ${paper.is_first_author ? '<span class="author-tag first-author">First Author</span>' : ''}
+                                    ${paper.is_corresponding_author ? '<span class="author-tag corresponding-author">Corresponding Author</span>' : ''}
+                                </div>
+                                <div class="paper-meta">Venue: ${paper.venue}</div>
+                                ${paper.url ? `<a href="${paper.url}" target="_blank">View Paper</a>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                    resultsDiv.innerHTML = papersHtml;
+                } else {
+                    resultsDiv.innerHTML = '<p>No papers found.</p>';
+                }
+            })
+            .catch(error => {
+                loadingDiv.style.display = 'none';
+                resultsDiv.innerHTML = `<p style="color: red">Error: ${error.message}</p>`;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load research fields
+            fetch('http://localhost:5000/fields')
+                .then(response => response.json())
+                .then(data => {
+                    const fieldSelect = document.getElementById('researchField');
+                    data.fields.forEach(field => {
+                        const option = document.createElement('option');
+                        option.value = field.value;
+                        option.textContent = field.label;
+                        fieldSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading research fields:', error));
+
+            const firstAuthor = document.getElementById('firstAuthor');
+            const correspondingAuthor = document.getElementById('correspondingAuthor');
+            const bothPositions = document.getElementById('bothPositions');
+
+            function updateCheckboxes(event) {
+                if (event.target === bothPositions) {
+                    if (bothPositions.checked) {
+                        firstAuthor.checked = false;
+                        correspondingAuthor.checked = false;
+                    }
+                } else {
+                    if (firstAuthor.checked || correspondingAuthor.checked) {
+                        bothPositions.checked = false;
+                    }
+                }
+            }
+
+            firstAuthor.addEventListener('change', updateCheckboxes);
+            correspondingAuthor.addEventListener('change', updateCheckboxes);
+            bothPositions.addEventListener('change', updateCheckboxes);
+        });
+    </script>
+</body>
+</html>
